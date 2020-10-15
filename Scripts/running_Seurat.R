@@ -57,7 +57,7 @@ mydata
 ## I just realize that MT genes have been annotated in the list of features.
 ## However, it is named like this "ENSMUSG00000064336-MT-TF"
 ## Therefore, the pattern input for PercentageFeatureSet function will be different
-mydata[["percent.mt"]] <- PercentageFeatureSet(mydata, pattern = "-MT") #F: Good, you can also use "-MT-" to be extra precise
+mydata[["percent.mt"]] <- PercentageFeatureSet(mydata, pattern = "-MT-") #F: Good, you can also use "-MT-" to be extra precise
 head(mydata@meta.data, 5)
 #              orig.ident
 # C1.101.A10_CGAGGCTG.GCGTAAGA_L008_R1_all interneuron
@@ -250,7 +250,7 @@ input.matrix[1:5,1:5]
 #F: then we can recreate the seuratobject and filter the cells further
 mydata <- CreateSeuratObject(counts = input.matrix, min.cells = 3, min.genes = 200, project = "interneuron") #F: Good
 
-mydata[["percent.mt"]] <- PercentageFeatureSet(mydata, pattern = "-MT")
+mydata[["percent.mt"]] <- PercentageFeatureSet(mydata, pattern = "-MT-")
 head(mydata@meta.data, 5)
 plot1 <- FeatureScatter(mydata, feature1 = "nCount_RNA", feature2 = "percent.mt")
 plot2 <- FeatureScatter(mydata, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
@@ -268,7 +268,8 @@ mydata <- NormalizeData(mydata, normalization.method = "LogNormalize", scale.fac
 
 #F: THe authors used a different method for selection.method. Check the paper again and see if you can
 # replicate their method in Seurat
-mydata <- FindVariableFeatures(mydata, selection.method = "vst", nfeatures = 800)
+mydata <- FindVariableGenes(mydata, mean.function = ExpMean, dispersion.function = LogVMR, x.low.cutoff = 0.5, x.high.cutoff = 8, y.cutoff = 0.5, y.high.cutoff = 5)
+
 top10 <- head(VariableFeatures(mydata), 10)
 plot1 <- VariableFeaturePlot(mydata)
 plot2 <- LabelPoints(plot = plot1, points = top10, repel = TRUE)
